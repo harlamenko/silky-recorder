@@ -1,0 +1,9 @@
+node_modules/
+out/
+tmp/
+*.log
+
+# auth — секреты не коммитим
+auth/state.json
+auth/profile/
+.env

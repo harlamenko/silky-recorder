@@ -1,0 +1,22 @@
+{
+  "name": "silky-recorder",
+  "version": "0.1.0",
+  "description": "Record silky-smooth product tutorial videos from a declarative scenario: clean isolated browser (no extension artifacts), animated cursor, zoom camera, captions, click/keyboard sounds and background music.",
+  "type": "module",
+  "bin": {
+    "silky": "bin/silky.mjs"
+  },
+  "scripts": {
+    "login": "node bin/silky.mjs login",
+    "record": "node bin/silky.mjs record",
+    "postinstall": "playwright install chromium"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "playwright": "^1.49.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
