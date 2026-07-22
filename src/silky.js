@@ -56,8 +56,13 @@
       flex-direction:column;gap:14px;background:radial-gradient(120% 120% at 50% 40%,#2a2d3a,#0e0f14);
       color:#fff;opacity:0;transition:opacity .5s ease;pointer-events:none;text-align:center;padding:5vw;}
     #__silky_title.show{opacity:1;}
-    #__silky_title h1{font:700 clamp(28px,5vw,64px)/1.1 system-ui,sans-serif;margin:0;letter-spacing:-.02em;}
-    #__silky_title p{font:400 clamp(15px,2vw,22px)/1.4 system-ui,sans-serif;margin:0;opacity:.75;}
+    /* Цвет и рамки задаём на самих h1/p, а не наследуем от карточки: сайт-хозяин почти всегда
+       стилизует свои заголовки, и его правило на элементе перебивает наследование (у Википедии
+       карточка так получала тёмный текст и чужое подчёркивание). */
+    #__silky_title h1{font:700 clamp(28px,5vw,64px)/1.1 system-ui,sans-serif;margin:0;letter-spacing:-.02em;
+      color:#fff;border:0;padding:0;background:none;text-shadow:none;}
+    #__silky_title p{font:400 clamp(15px,2vw,22px)/1.4 system-ui,sans-serif;margin:0;opacity:.75;
+      color:#fff;border:0;padding:0;background:none;text-shadow:none;}
     body{will-change:transform;}`;
   document.head.appendChild(style);
 
