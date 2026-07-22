@@ -8,30 +8,40 @@
     "auth": { "type": "none" },
     "music": { "file": "assets/music.mp3", "vol": 0.85 },
     "sfx": { "click": "assets/click.wav", "key": "assets/key.wav", "clickVol": 0.34, "keyVol": 0.17 },
+    "voice": { "name": "ru-RU-SvetlanaNeural", "rate": "+6%", "duck": 0.22 },
     "out": "out/wikipedia.mp4"
   },
   "steps": [
-    { "type": "title", "text": "Демо silky-recorder", "sub": "Поиск и статья в Википедии", "hold": 3000 },
+    { "type": "title", "text": "Демо silky-recorder", "sub": "Поиск и статья в Википедии", "hold": 3000,
+      "say": "Это демонстрация silky-recorder. Покажем, как найти статью в Википедии." },
 
-    { "type": "caption", "text": "Найдём статью через поиск", "read": 2600 },
+    { "type": "caption", "text": "Найдём статью через поиск", "read": 2600,
+      "say": "Начнём с поиска: наведём курсор на строку поиска вверху страницы." },
     { "type": "click", "target": "input[name=\"search\"]", "move": 1000, "after": 700 },
-    { "type": "type", "target": "input[name=\"search\"]", "text": "Кошка", "cps": 4, "after": 1500 },
-    { "type": "caption", "text": "Открываем статью", "read": 2000 },
+    { "type": "type", "target": "input[name=\"search\"]", "text": "Кошка", "cps": 4, "after": 1500,
+      "say": "Печатаем запрос — например, слово «кошка»." },
+    { "type": "caption", "text": "Открываем статью", "read": 2000,
+      "say": "Нажимаем Enter, чтобы открыть статью." },
     { "type": "key", "key": "Enter", "after": 4000 },
 
-    { "type": "caption", "text": "Вот заголовок статьи", "read": 2600 },
-    { "type": "zoom", "target": "h1", "scale": 1.4, "hold": 3000, "after": 1200 },
+    { "type": "caption", "text": "Вот заголовок статьи", "read": 2600, "say": false },
+    { "type": "zoom", "target": "h1", "scale": 1.4, "hold": 3000, "after": 1200,
+      "say": "Статья открылась. Приблизим заголовок, чтобы его было хорошо видно." },
 
-    { "type": "caption", "text": "Слева — карточка с фактами", "read": 2600 },
+    { "type": "caption", "text": "Слева — карточка с фактами", "read": 2600, "say": false },
     { "type": "scroll", "target": ".infobox", "after": 1400 },
-    { "type": "zoom", "target": ".infobox", "scale": 1.3, "hold": 3000, "after": 1200 },
+    { "type": "zoom", "target": ".infobox", "scale": 1.3, "hold": 3000, "after": 1200,
+      "say": "Справа от текста — карточка с краткими фактами о предмете статьи." },
 
-    { "type": "caption", "text": "Пролистаем к разделу", "read": 2400 },
+    { "type": "caption", "text": "Пролистаем к разделу", "read": 2400,
+      "say": "Прокрутим страницу к первому разделу." },
     { "type": "scroll", "target": { "css": "h2", "index": 1 }, "after": 2600 },
 
-    { "type": "caption", "text": "И наведёмся на ссылку", "read": 2400 },
+    { "type": "say", "text": "А теперь наведём курсор на ссылку внутри текста и приблизим её." },
+    { "type": "caption", "text": "И наведёмся на ссылку", "read": 2400, "say": false },
     { "type": "hover", "target": { "css": "#bodyContent p a", "index": 1 }, "zoom": 1.6, "hold": 2600, "after": 900 },
 
-    { "type": "outro", "text": "Готово!", "sub": "Так делается любой туториал", "hold": 3000 }
+    { "type": "outro", "text": "Готово!", "sub": "Так делается любой туториал", "hold": 3000,
+      "say": "Готово. Точно так же собирается туториал по любому сайту." }
   ]
 }

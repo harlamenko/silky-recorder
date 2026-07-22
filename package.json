@@ -9,10 +9,13 @@
   "scripts": {
     "login": "node bin/silky.mjs login",
     "record": "node bin/silky.mjs record",
+    "voices": "node bin/silky.mjs voices",
+    "test": "node --test test/*.test.mjs",
     "postinstall": "playwright install chromium"
   },
   "dependencies": {
     "ffmpeg-static": "^5.2.0",
+    "node-edge-tts": "^1.2.10",
     "playwright": "^1.49.0"
   },
   "engines": {

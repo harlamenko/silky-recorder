@@ -7,3 +7,4 @@ tmp/
 auth/state.json
 auth/profile/
 .env
+voice/
