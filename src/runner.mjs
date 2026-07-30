@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { resolvePath, makeWorkdir } from './config.mjs';
+import { resolvePath, makeWorkdir, VIEWPORT } from './config.mjs';
 import { authState } from './auth.mjs';
 import { voiceConfig, narrationOf, prepareVoices } from './tts.mjs';
 
@@ -37,6 +37,34 @@ async function waitReady(page, ready) {
   if (typeof ready === 'string') return page.waitForSelector(ready, { timeout: 45000 });
   if (ready.text) return page.waitForFunction(t => document.body.innerText.includes(t), ready.text, { timeout: 45000 });
   if (ready.selector) return page.waitForSelector(ready.selector, { timeout: 45000 });
+}
+
+// Захват кадров через CDP-скринкаст вместо recordVideo Playwright: тот жёстко ограничен
+// 25 fps и на длинных записях теряет кадры, отчего видео дёргается. Скринкаст отдаёт
+// каждый кадр композитора (до 60 fps) с точным таймстампом — на монтаже из них
+// собирается ровный CFR-поток. Кадры пишутся в workdir и удаляются после сборки.
+async function startCapture(page, work, capture = {}) {
+  const cdp = await page.context().newCDPSession(page);
+  const frames = [];   // { file, ts } — ts в мс эпохи (той же, что Date.now())
+  const writes = new Set();
+  let seq = 0;
+  cdp.on('Page.screencastFrame', ev => {
+    cdp.send('Page.screencastFrameAck', { sessionId: ev.sessionId }).catch(() => {});
+    const file = path.join(work, `f${String(seq++).padStart(6, '0')}.jpg`);
+    frames.push({ file, ts: ev.metadata.timestamp * 1000 });
+    const w = fs.promises.writeFile(file, Buffer.from(ev.data, 'base64'))
+      .catch(() => {}).finally(() => writes.delete(w));
+    writes.add(w);
+  });
+  await cdp.send('Page.startScreencast', {
+    format: 'jpeg', quality: capture.quality ?? 80,
+    maxWidth: VIEWPORT.width, maxHeight: VIEWPORT.height, everyNthFrame: 1,
+  });
+  return async () => {
+    await cdp.send('Page.stopScreencast').catch(() => {});
+    await Promise.all([...writes]);
+    return frames;
+  };
 }
 
 // переинжект движка после полного перехода по URL (silky живёт в window и стирается навигацией)
@@ -150,10 +178,15 @@ export async function record(scenario, opts = {}) {
   const work = makeWorkdir();
 
   const { chromium } = await import('playwright');
-  const browser = await chromium.launch({ headless: !opts.headed });
+  // GPU-растеризация и в headless: без неё софтверный растр 1080p тянет ~40 кадров/с
+  // на полнокадровых анимациях (зум, тайтл), с ней — стабильные ~60. Без GPU флаги
+  // безопасно игнорируются (Chromium сам падает обратно на софтверный растр).
+  const browser = await chromium.launch({
+    headless: !opts.headed,
+    args: ['--enable-gpu', '--ignore-gpu-blocklist', '--enable-gpu-rasterization'],
+  });
   const context = await browser.newContext({
-    viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1,
-    recordVideo: { dir: work, size: { width: 1920, height: 1080 } },
+    viewport: VIEWPORT, deviceScaleFactor: 1,
     ...(state ? { storageState: state } : {}),
   });
 
@@ -165,6 +198,7 @@ export async function record(scenario, opts = {}) {
   }, hide);
 
   const page = await context.newPage();
+  const stopCapture = await startCapture(page, work, meta.capture);
   const recStart = Date.now();
   const events = [];
   const mark = (type, extra = {}, offsetMs = 0) => events.push({ t: Date.now() - recStart + offsetMs, type, ...extra });
@@ -184,9 +218,11 @@ export async function record(scenario, opts = {}) {
   }
 
   const totalMs = Date.now() - recStart;
+  const frames = await stopCapture();
+  const capEnd = Date.now();
   await context.close();
   await browser.close();
 
-  const webm = fs.readdirSync(work).filter(f => f.endsWith('.webm')).map(f => path.join(work, f))[0];
-  return { video: webm, events, sceneStart, totalMs, work, meta, voice };
+  if (!frames.length) throw new Error('скринкаст не отдал ни одного кадра');
+  return { frames, recStart, capEnd, events, sceneStart, totalMs, work, meta, voice };
 }
