@@ -5,6 +5,9 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+// Единый размер кадра: вьюпорт браузера, скринкаст и финальное видео.
+export const VIEWPORT = { width: 1920, height: 1080 };
+
 // ~/x -> $HOME/x ; относительные -> от корня репо ; абсолютные как есть
 export function resolvePath(p, base = ROOT) {
   if (!p) return p;

@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import ffmpegStatic from 'ffmpeg-static';
-import { resolvePath, ensureDir } from './config.mjs';
+import { resolvePath, ensureDir, VIEWPORT } from './config.mjs';
 
 const FFMPEG = (ffmpegStatic && fs.existsSync(ffmpegStatic)) ? ffmpegStatic : 'ffmpeg';
 
@@ -18,9 +18,23 @@ export function duckExpr(segments, duck, rampMs) {
   return `1-${(1 - duck).toFixed(3)}*min(1\\,${humps.join('+')})`;
 }
 
-// rec = { video, events, sceneStart, meta } из runner.record()
+// Раскладка кадров скринкаста по таймлайну: кадр показывается от своего таймстампа до
+// следующего, кадры до t0 (лид-ин загрузки) схлопываются в один стартовый. Из этих
+// длительностей ffmpeg (fps-фильтр) собирает ровный CFR-поток заданной частоты.
+export function frameTimeline(frames, t0, endTs) {
+  const start = Math.max(0, frames.findLastIndex(f => f.ts <= t0));
+  const used = frames.slice(start);
+  return used.map((f, i) => {
+    const from = Math.max(f.ts, t0);
+    const to = i + 1 < used.length ? used[i + 1].ts : Math.max(endTs, from + 1);
+    return { file: f.file, dur: Math.max(to - from, 1) / 1000 };
+  });
+}
+
+// rec = { frames, recStart, capEnd, events, sceneStart, meta } из runner.record()
 export function build(rec, opts = {}) {
-  const { video, events, sceneStart, meta, voice } = rec;
+  const { frames, recStart, capEnd, events, sceneStart, meta, voice } = rec;
+  const fps = meta.fps ?? 60;
   const trim = Math.max(0, sceneStart / 1000 - 0.25);         // убрать лид-ин загрузки
   const music = meta.music || {}, sfx = meta.sfx || {};
   const musicFile = resolvePath(music.file || 'assets/music.mp3');
@@ -37,7 +51,13 @@ export function build(rec, opts = {}) {
     .filter(e => e.type === 'voice' && fs.existsSync(e.file))
     .map(e => ({ file: e.file, at: Math.max(0, e.t / 1000 - trim), durMs: e.durMs }));
 
-  const inputs = ['-ss', String(trim), '-i', video];
+  const timeline = frameTimeline(frames, recStart + trim * 1000, capEnd);
+  const list = path.join(path.dirname(frames[0].file), 'frames.ffconcat');
+  fs.writeFileSync(list, ['ffconcat version 1.0',
+    ...timeline.flatMap(f => [`file '${f.file}'`, `duration ${f.dur.toFixed(6)}`]),
+    `file '${timeline[timeline.length - 1].file}'`, ''].join('\n'));
+
+  const inputs = ['-f', 'concat', '-safe', '0', '-i', list];
   const idx = {}; let n = 1;
   const hasMusic = fs.existsSync(musicFile);
   const hasClick = fs.existsSync(clickFile) && clicks.length;
@@ -67,14 +87,15 @@ export function build(rec, opts = {}) {
   }
 
   const args = ['-y', '-hide_banner', '-loglevel', 'error', ...inputs];
+  fc.push(`[0:v]fps=${fps},scale=${VIEWPORT.width}:${VIEWPORT.height},format=yuv420p[vout]`);
   if (labels.length) {
     fc.push(`${labels.join('')}amix=inputs=${labels.length}:normalize=0:dropout_transition=0[mix]`);
     fc.push(`[mix]alimiter=limit=0.9[aout]`);
-    args.push('-filter_complex', fc.join(';'), '-map', '0:v', '-map', '[aout]', '-c:a', 'aac', '-b:a', '160k');
+    args.push('-filter_complex', fc.join(';'), '-map', '[vout]', '-map', '[aout]', '-c:a', 'aac', '-b:a', '160k');
   } else {
-    args.push('-map', '0:v', '-an');
+    args.push('-filter_complex', fc.join(';'), '-map', '[vout]', '-an');
   }
-  args.push('-c:v', 'libx264', '-crf', '20', '-preset', 'medium', '-pix_fmt', 'yuv420p', '-shortest', out);
+  args.push('-c:v', 'libx264', '-crf', '20', '-preset', 'medium', '-shortest', out);
 
   const r = spawnSync(FFMPEG, args, { encoding: 'utf8', maxBuffer: 1 << 26 });
   if (r.status !== 0) throw new Error('ffmpeg упал:\n' + (r.stderr || r.error));

@@ -28,7 +28,7 @@
     { "type": "zoom", "target": "h1", "scale": 1.4, "hold": 3000, "after": 1200,
       "say": "Статья открылась. Приблизим заголовок, чтобы его было хорошо видно." },
 
-    { "type": "caption", "text": "Слева — карточка с фактами", "read": 2600, "say": false },
+    { "type": "caption", "text": "Справа — карточка с фактами", "read": 2600, "say": false },
     { "type": "scroll", "target": ".infobox", "after": 1400 },
     { "type": "zoom", "target": ".infobox", "scale": 1.3, "hold": 3000, "after": 1200,
       "say": "Справа от текста — карточка с краткими фактами о предмете статьи." },
