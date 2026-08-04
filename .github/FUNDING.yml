@@ -1,3 +1,5 @@
 # Кнопка Sponsor в шапке репозитория. Ключ custom принимает только URL,
 # поэтому крипто-реквизиты лежат в README, а сюда идёт ссылка на них.
-custom: ['https://github.com/harlamenko/silky-recorder#support-the-project']
+custom:
+  - 'https://boosty.to/haste'
+  - 'https://github.com/harlamenko/silky-recorder#support-the-project'
