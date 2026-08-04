@@ -273,7 +273,7 @@ silky-recorder is free and MIT-licensed, and stays that way. If it saved you an 
 re-recording, you can buy me a coffee:
 
 - **USDT (TRC-20)** - `TPVXMisJGSh1QQLipd7ATbdqrSLBdmrU78`
-- **Boosty** - [boosty.to/haste](https://boosty.to/haste), if you hold a card issued in Russia
+- **Boosty** - [boosty.to/haste](https://boosty.to/haste/donate), if you hold a card issued in Russia
 
 The same crypto address accepts TRX and any other TRC-20 token. Please mind the network: funds sent
 over another chain to a TRON address cannot be recovered.
