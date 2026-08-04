@@ -267,6 +267,21 @@ silky voices [locale]          list narration voices, e.g. silky voices en-US
 
 ---
 
+## Support the project
+
+silky-recorder is free and MIT-licensed, and stays that way. If it saved you an afternoon of
+re-recording, you can buy me a coffee:
+
+- **USDT (TRC-20)** - `TPVXMisJGSh1QQLipd7ATbdqrSLBdmrU78`
+- **Boosty** - [boosty.to/haste](https://boosty.to/haste), if you hold a card issued in Russia
+
+The same crypto address accepts TRX and any other TRC-20 token. Please mind the network: funds sent
+over another chain to a TRON address cannot be recovered.
+
+Not into crypto? Starring the repo and telling one other person about it helps just as much.
+
+---
+
 ## License
 
 Code is MIT (`LICENSE`). Bundled media in `assets/` - see [`assets/NOTICE.md`](assets/NOTICE.md).
