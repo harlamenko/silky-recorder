@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "silky-recorder",
+    "subtitle": "One JSON file in. One polished MP4 out.",
+    "url": "https://en.wikipedia.org/wiki/Main_Page",
+    "readyWhen": "input[name=\"search\"]",
+    "settle": 800,
+    "auth": { "type": "none" },
+    "music": { "file": "assets/music.mp3", "vol": 0.85 },
+    "sfx": { "click": "assets/click.wav", "key": "assets/key.wav", "clickVol": 0.34, "keyVol": 0.17 },
+    "out": "out/demo-en.mp4"
+  },
+  "steps": [
+    { "type": "title", "text": "silky-recorder", "sub": "Product demos, generated from a script", "hold": 2600 },
+
+    { "type": "caption", "text": "The cursor moves and clicks on its own", "read": 2400 },
+    { "type": "click", "target": "input[name=\"search\"]", "move": 1000, "after": 600 },
+
+    { "type": "caption", "text": "Typing is animated, with keystroke sounds", "read": 2400 },
+    { "type": "type", "target": "input[name=\"search\"]", "text": "Cat", "cps": 4, "after": 1200 },
+    { "type": "key", "key": "Enter", "after": 3500 },
+
+    { "type": "caption", "text": "The camera zooms where it matters", "read": 2400 },
+    { "type": "zoom", "target": "h1", "scale": 1.4, "hold": 2600, "after": 1000 },
+
+    { "type": "caption", "text": "Scroll and hover are scripted too", "read": 2400 },
+    { "type": "scroll", "target": ".infobox", "after": 1200 },
+    { "type": "zoom", "target": ".infobox", "scale": 1.3, "hold": 2600, "after": 1000 },
+
+    { "type": "outro", "text": "No screen recorder. No editor.", "sub": "Headless, reproducible, in CI", "hold": 2800 }
+  ]
+}
