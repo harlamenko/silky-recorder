@@ -2,6 +2,28 @@
   "name": "silky-recorder",
   "version": "0.1.0",
   "description": "Record silky-smooth product tutorial videos from a declarative scenario: clean isolated browser (no extension artifacts), animated cursor, zoom camera, captions, click/keyboard sounds and background music.",
+  "keywords": [
+    "demo-video",
+    "product-demo",
+    "screencast",
+    "screen-recording",
+    "tutorial",
+    "playwright",
+    "headless",
+    "ffmpeg",
+    "text-to-speech",
+    "voiceover",
+    "documentation",
+    "devrel"
+  ],
+  "homepage": "https://github.com/harlamenko/silky-recorder#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harlamenko/silky-recorder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/harlamenko/silky-recorder/issues"
+  },
   "type": "module",
   "bin": {
     "silky": "bin/silky.mjs"
